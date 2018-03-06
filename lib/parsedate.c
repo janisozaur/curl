@@ -433,7 +433,7 @@ static int parsedate(const char *date, time_t *output)
           tzoff = (val/100 * 60 + val%100)*60;
 
           /* the + and - prefix indicates the local time compared to GMT,
-             this we need ther reversed math to get what we want */
+             this we need their reversed math to get what we want */
           tzoff = date[-1]=='+'?-tzoff:tzoff;
         }
 
@@ -498,7 +498,7 @@ static int parsedate(const char *date, time_t *output)
 
 #if (SIZEOF_TIME_T < 5)
 
-#if HAVE_TIME_T_UNSIGNED
+#ifdef HAVE_TIME_T_UNSIGNED
   /* an unsigned 32 bit time_t can only hold dates to 2106 */
   if(yearnum > 2105) {
     *output = TIME_T_MAX;
@@ -561,14 +561,10 @@ time_t curl_getdate(const char *p, const time_t *now)
   int rc = parsedate(p, &parsed);
   (void)now; /* legacy argument from the past that we ignore */
 
-  switch(rc) {
-  case PARSEDATE_OK:
+  if(rc == PARSEDATE_OK) {
     if(parsed == -1)
       /* avoid returning -1 for a working scenario */
       parsed++;
-    /* fallthrough */
-  case PARSEDATE_LATER:
-  case PARSEDATE_SOONER:
     return parsed;
   }
   /* everything else is fail */
