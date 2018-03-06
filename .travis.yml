@@ -117,7 +117,7 @@ before_script:
                   cd brotli-1.0.1 &&
                   cmake . -DCMAKE_INSTALL_PREFIX=/usr \
                           -DCMAKE_INSTALL_LIBDIR=/usr/lib &&
-                  make &&
+                  make -j2 &&
                   sudo make install
               )
           fi
@@ -128,7 +128,7 @@ before_script:
             mkdir build &&
             cd build &&
             cmake -DCMAKE_BUILD_TYPE=release -DBUILD_SHARED_LIBS=1 .. &&
-            make &&
+            make -j2 &&
             cd .. &&
             mkdir lib &&
             cd lib &&
@@ -145,7 +145,7 @@ script:
         if [ "$T" = "coverage" ]; then
              export CC="gcc-6"
              ./configure --enable-debug --disable-shared --enable-code-coverage
-             make
+             make -j2
              make TFLAGS=-n test-nonflaky
              tests="1 2 3 4 5 6 7 8 9 10 200 201 202 300 301 302 500 501 502 503 504 506 507 508 509 510 511 512 513 514 515 516 517 518 519 600 601 800 801 802 803 900 901 902 903 1000 1001 1002 1004 1302 1303 1304 1305 1306 1308 1400 1401 1402 1404 1450 1451 1452 1502 1507 1508 1600 1602 1603 1605"
              make "TFLAGS=-n -e $tests" test-nonflaky
@@ -157,21 +157,21 @@ script:
         set -eo pipefail
         if [ "$T" = "debug" ]; then
              ./configure --enable-debug --enable-werror $C
-             make && make examples
+             make -j2 && make -j2 examples
              make TFLAGS=-n test-nonflaky
         fi
     - |
         set -eo pipefail
         if [ "$T" = "novalgrind" ]; then
              ./configure $C
-             make && make examples
+             make -j2 && make -j2 examples
              make TFLAGS=-n test-nonflaky
         fi
     - |
         set -eo pipefail
         if [ "$T" = "normal" ]; then
              ./configure --enable-warnings --enable-werror $C
-             make && make examples
+             make -j2 && make -j2 examples
              make test-nonflaky
         fi
     - |
@@ -179,7 +179,7 @@ script:
         if [ "$T" = "iconv" ]; then
              source .travis-iconv-env.sh
              ./configure --enable-debug --enable-werror $C
-             make && make examples
+             make -j2 && make -j2 examples
              make TFLAGS=-n test-nonflaky
         fi
     - |
@@ -188,19 +188,19 @@ script:
              mkdir build
              cd build
              cmake ..
-             make
+             make -j2
         fi
     - |
         set -eo pipefail
         if [ "$T" = "distcheck" ]; then
             ./configure
-            make
+            make -j2
             ./maketgz 99.98.97
             # verify in-tree build - and install it
             (tar xf curl-99.98.97.tar.gz && \
              cd curl-99.98.97 && \
              ./configure --prefix=$HOME/temp && \
-             make && \
+             make -j2 && \
              make TFLAGS=1 test && \
              make install)
             # basic check of the installed files
@@ -211,7 +211,7 @@ script:
              mkdir build && \
              cd build && \
              ../curl-99.98.97/configure && \
-             make && \
+             make -j2 && \
              make TFLAGS=1 test)
             # verify cmake build
             rm -rf curl-99.98.97
@@ -220,7 +220,7 @@ script:
              mkdir build && \
              cd build && \
              cmake .. && \
-             make)
+             make -j2)
         fi
     - |
         set -eo pipefail
